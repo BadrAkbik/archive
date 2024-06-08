@@ -3,29 +3,55 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PermissionResource\Pages;
-use App\Filament\Resources\PermissionResource\RelationManagers;
 use App\Models\Permission;
-use Filament\Forms;
+use App\Models\Role;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('attributes.permissions');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('attributes.permission');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('attributes.permissions');
+    }
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                Select::make('roles')
+                    ->label(__('attributes.roles'))
+                    ->relationship('roles', 'id')
+                    ->multiple()
+                    ->live()
+                    ->preload()
+                    ->exists('roles', 'id')
+                    ->options(Role::whereNot('name', 'owner')->pluck('name', 'id'))
+                    ->searchable()
+                    ->required(),
             ]);
     }
 
@@ -33,13 +59,20 @@ class PermissionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('id')
+                    ->label(__('attributes.id'))
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label(__('attributes.permission'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('name_ar')
+                    ->label(__('attributes.permission_ar'))
+                    ->searchable(),
+                TextColumn::make('roles.name')
+                    ->label(__('attributes.role'))
+                    ->searchable(),
+                TextColumn::make('created_at')
+                    ->label(__('attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -48,11 +81,12 @@ class PermissionResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -68,7 +102,6 @@ class PermissionResource extends Resource
     {
         return [
             'index' => Pages\ListPermissions::route('/'),
-            'create' => Pages\CreatePermission::route('/create'),
             'edit' => Pages\EditPermission::route('/{record}/edit'),
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -19,5 +20,12 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'user']);
         Role::create(['name' => 'admin']);
 
+        $permissions = include base_path('data/permissions.php');
+        foreach ($permissions as $key => $value) {
+            Permission::create([
+                'name' => $key,
+                'name_ar' => $value,
+            ]);
+        }
     }
 }

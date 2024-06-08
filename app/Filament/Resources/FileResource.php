@@ -6,42 +6,71 @@ use App\Filament\Resources\FileResource\Pages;
 use App\Filament\Resources\FileResource\RelationManagers;
 use App\Models\File;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class FileResource extends Resource
 {
     protected static ?string $model = File::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
+
+
+    public static function getNavigationLabel(): string
+    {
+        return __('attributes.files');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('attributes.file');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('attributes.files');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
+                Hidden::make('user_id')->default(request()->user()->id),
+                TextInput::make('registeration_number')
+                    ->label(__('attributes.registeration_number'))
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('path')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('registeration_number')
-                    ->required()
+                Textarea::make('description')
+                    ->label(__('attributes.description')),
+                TextInput::make('debtor_amount')
+                    ->label(__('attributes.debtor_amount'))->required()
                     ->numeric(),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('debtor_amount')
-                    ->required()
+                TextInput::make('creditor_amount')
+                    ->label(__('attributes.creditor_amount'))->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('creditor_amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
+                    ->label(__('attributes.date'))
+                    ->required(),
+                FileUpload::make('path')
+                    ->label(__('attributes.file'))
+                    ->moveFiles()
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->directory('pdf_files')
                     ->required(),
             ]);
     }
@@ -50,28 +79,38 @@ class FileResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
+                TextColumn::make('id')
+                    ->label(__('attributes.id'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('path')
+                TextColumn::make('user.username')
+                    ->label(__('attributes.username'))
+                    ->sortable(),
+                TextColumn::make('description')
+                    ->label(__('attributes.description'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('registeration_number')
+                TextColumn::make('registeration_number')
+                    ->label(__('attributes.registeration_number'))
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('debtor_amount')
+                TextColumn::make('debtor_amount')
+                    ->label(__('attributes.debtor_amount'))
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('creditor_amount')
+                TextColumn::make('creditor_amount')
+                    ->label(__('attributes.creditor_amount'))
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
+                    ->label(__('attributes.date'))
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('path')
+                    ->url(fn ($record) => route('file.download', ['fileId' => $record->id])) // Assuming 'path' stores the file path
+                    ->label(__('attributes.file'))
+                    ->formatStateUsing(fn ($state) => __('attributes.download_file'))
+                    ->color('success'),
+                TextColumn::make('created_at')
+                    ->label(__('attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -80,11 +119,12 @@ class FileResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

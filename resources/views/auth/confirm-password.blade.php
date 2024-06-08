@@ -8,7 +8,7 @@
 
         <!-- Password -->
         <div>
-            <x-input-label for="password" :value="__('authpages.password')" />
+            <x-input-label for="password" :value="__('authpage.password')" />
 
             <x-text-input id="password" class="block mt-1 w-full"
                             type="password"
@@ -20,7 +20,7 @@
 
         <div class="flex justify-end mt-4">
             <x-primary-button>
-                {{ __('Confirm') }}
+                {{ __('authpage.password_confirmation') }}
             </x-primary-button>
         </div>
     </form>

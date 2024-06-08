@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('path');
             $table->integer('registeration_number');
-            $table->text('description');
-            $table->float('debtor_amount', 2);
-            $table->float('creditor_amount', 2);
+            $table->text('description')->nullable();
+            $table->float('debtor_amount', 2)->nullable();
+            $table->float('creditor_amount', 2)->nullable();
             $table->date('date');
             $table->timestamps();
         });

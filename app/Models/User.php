@@ -40,4 +40,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
 }

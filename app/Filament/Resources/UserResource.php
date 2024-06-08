@@ -4,49 +4,97 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\Role;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationLabel(): string
+    {
+        return __('attributes.users');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('attributes.user');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('attributes.users');
+    }
+
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
+                    ->label(__('attributes.name'))
+                    ->minLength(2)->maxLength(15)->string()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('username')
+                TextInput::make('username')
+                    ->label(__('attributes.username'))
                     ->required()
+                    ->regex('/^[a-zA-Z0-9]{6,14}$/')
+                    ->validationMessages([
+                        'regex' => __('authpage.The username must be between 6 to 14 characters and contain only letters and numbers.'),
+                    ])
+                    ->unique(User::class, 'username', ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
+                TextInput::make('email')
+                    ->label(__('attributes.email'))
                     ->email()
+                    ->unique(User::class, 'email', ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('phone_num')
+                TextInput::make('phone_num')
+                    ->label(__('attributes.phone_num'))
                     ->tel()
                     ->maxLength(255)
                     ->default(null),
-                Forms\Components\Toggle::make('is_approved')
-                    ->required(),
-                Forms\Components\TextInput::make('role_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
+                Select::make('role_id')
+                    ->label(__('attributes.role'))
+                    ->relationship('role', 'id')
+                    ->exists('roles', 'id')
+                    ->live()
+                    ->preload()
+                    ->options(
+                        function () {
+                            return Role::whereNotIn('name', ['owner'])->pluck('name', 'id');
+                        }
+                    ),
+                TextInput::make('password')
+                    ->label(__('attributes.password'))
                     ->password()
+                    ->hiddenOn('edit')
                     ->required()
                     ->maxLength(255),
+                Hidden::make('email_verified_at')->default(now())
             ]);
     }
 
@@ -54,27 +102,27 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('id')
+                    ->label(__('attributes.id'))
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label(__('attributes.name'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('username')
+                TextColumn::make('username')
+                    ->label(__('attributes.username'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
+                    ->label(__('attributes.email'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone_num')
+                TextColumn::make('phone_num')
+                    ->label(__('attributes.phone_num'))
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_approved')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('role_id')
+                TextColumn::make('role.name')
+                    ->label(__('attributes.role'))
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('created_at')
+                    ->label(__('attributes.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -83,11 +131,12 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
