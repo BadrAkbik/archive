@@ -60,10 +60,10 @@ class FileResource extends Resource
                     ->label(__('attributes.description'))
                     ->maxLength(10000),
                 TextInput::make('debtor_amount')
-                    ->label(__('attributes.debtor_amount'))->required()
+                    ->label(__('attributes.debtor_amount'))
                     ->numeric(),
                 TextInput::make('creditor_amount')
-                    ->label(__('attributes.creditor_amount'))->required()
+                    ->label(__('attributes.creditor_amount'))
                     ->numeric(),
                 DatePicker::make('date')
                     ->label(__('attributes.date'))
