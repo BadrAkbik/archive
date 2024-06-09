@@ -120,10 +120,11 @@ class UserResource extends Resource
                 TextColumn::make('role.name')
                     ->label(__('attributes.role'))
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('attributes.created_at'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

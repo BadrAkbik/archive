@@ -36,5 +36,7 @@ return [
     'Update your account\'s profile information and email address.' => 'تحديث معلومات ملف حسابك الشخصي وعنوان البريد الإلكتروني.',
     'profile_information' => 'معلومات الملف الشخصي',
     'dashboard' => 'لوحة التحكم',
-    'download_file' => 'تحميل الملف'
+    'download_file' => 'تحميل الملف',
+    'download' => 'تحميل',
+    'view' => 'عرض'
 ];

@@ -18,6 +18,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -56,7 +57,8 @@ class FileResource extends Resource
                     ->required()
                     ->numeric(),
                 Textarea::make('description')
-                    ->label(__('attributes.description')),
+                    ->label(__('attributes.description'))
+                    ->maxLength(10000),
                 TextInput::make('debtor_amount')
                     ->label(__('attributes.debtor_amount'))->required()
                     ->numeric(),
@@ -84,13 +86,16 @@ class FileResource extends Resource
                     ->sortable(),
                 TextColumn::make('user.username')
                     ->label(__('attributes.username'))
-                    ->sortable(),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('description')
                     ->label(__('attributes.description'))
-                    ->searchable(),
+                    ->wrap()
+                    ->words(20)
+                    ->searchable(isIndividual: true),
                 TextColumn::make('registeration_number')
                     ->label(__('attributes.registeration_number'))
                     ->numeric()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('debtor_amount')
                     ->label(__('attributes.debtor_amount'))
@@ -102,16 +107,18 @@ class FileResource extends Resource
                     ->sortable(),
                 TextColumn::make('date')
                     ->label(__('attributes.date'))
-                    ->date()
+                    ->date('d/m/Y')
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('path')
                     ->url(fn ($record) => route('file.download', ['fileId' => $record->id])) // Assuming 'path' stores the file path
                     ->label(__('attributes.file'))
                     ->formatStateUsing(fn ($state) => __('attributes.download_file'))
+                    ->visible(request()->user()->hasPermission('file.download'))
                     ->color('success'),
                 TextColumn::make('created_at')
                     ->label(__('attributes.created_at'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -119,6 +126,7 @@ class FileResource extends Resource
                 //
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

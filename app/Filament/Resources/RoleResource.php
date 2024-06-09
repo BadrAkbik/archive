@@ -96,7 +96,7 @@ class RoleResource extends Resource
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label(__('attributes.created_at'))
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
