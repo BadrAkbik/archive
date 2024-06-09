@@ -46,6 +46,16 @@ class UserResource extends Resource
         return __('attributes.users');
     }
 
+    public static function canEdit($record): bool
+    {
+        return $record->role->name !== 'owner';
+    }
+
+    public static function canDelete($record): bool
+    {
+        return $record->role->name !== 'owner';
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
