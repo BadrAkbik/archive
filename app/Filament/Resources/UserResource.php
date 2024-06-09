@@ -60,7 +60,7 @@ class UserResource extends Resource
                 TextInput::make('username')
                     ->label(__('attributes.username'))
                     ->required()
-                    ->regex('/^[a-zA-Z0-9]{6,14}$/')
+                    ->regex('/^[a-zA-Z0-9]{5,14}$/')
                     ->validationMessages([
                         'regex' => __('authpage.The username must be between 6 to 14 characters and contain only letters and numbers.'),
                     ])
