@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('path');
+            $table->string('path')->nullable();
             $table->integer('registeration_number');
             $table->text('description')->nullable();
             $table->float('debtor_amount', 2)->nullable();

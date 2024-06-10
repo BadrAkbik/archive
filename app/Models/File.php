@@ -11,7 +11,7 @@ class File extends Model
     use HasFactory;
 
     protected $guarded = [];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -25,6 +25,16 @@ class File extends Model
             // Delete the file
             if ($file->path) {
                 Storage::disk('private')->delete($file->path);
+            }
+        });
+
+        static::updating(function ($file) {
+            // Delete the file
+            if ($file->isdirty()) {
+                $originalFile = $file->getOriginal('path');
+                if ($originalFile) {
+                    Storage::disk('private')->delete($originalFile);
+                }
             }
         });
     }

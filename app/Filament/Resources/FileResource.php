@@ -68,8 +68,7 @@ class FileResource extends Resource
                     ->acceptedFileTypes(['application/pdf'])
                     ->preserveFilenames()
                     ->disk('private')
-                    ->directory('pdf_files')
-                    ->required(),
+                    ->directory('pdf_files'),
             ]);
     }
 
@@ -109,7 +108,7 @@ class FileResource extends Resource
                 TextColumn::make('path')
                     ->url(fn ($record) => route('file.download', ['fileId' => $record->id])) // Assuming 'path' stores the file path
                     ->label(__('attributes.file'))
-                    ->formatStateUsing(fn ($state) => __('attributes.download_file'))
+                    ->formatStateUsing(fn () => __('attributes.download_file'))
                     ->visible(request()->user()->hasPermission('file.download'))
                     ->color('success'),
                 TextColumn::make('created_at')
