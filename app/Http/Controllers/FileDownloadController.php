@@ -18,6 +18,7 @@ class FileDownloadController extends Controller
         }
 
         // Return the file as a response
-        return Storage::disk('public')->download($fileRecord->path);
+        return response()->download(storage_path('/app/public/' . $fileRecord->path));
+        /* return Storage::disk('public')->download($fileRecord->path); */
     }
 }
