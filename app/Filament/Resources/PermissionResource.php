@@ -6,7 +6,6 @@ use App\Filament\Resources\PermissionResource\Pages;
 use App\Models\Permission;
 use App\Models\Role;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
