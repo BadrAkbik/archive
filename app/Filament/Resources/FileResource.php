@@ -72,6 +72,7 @@ class FileResource extends Resource
                     ->label(__('attributes.file'))
                     ->moveFiles()
                     ->acceptedFileTypes(['application/pdf'])
+                    ->disk('private')
                     ->directory('pdf_files')
                     ->required(),
             ]);

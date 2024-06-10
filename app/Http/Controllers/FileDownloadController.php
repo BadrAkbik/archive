@@ -13,12 +13,11 @@ class FileDownloadController extends Controller
         // Find the file record by its ID
         $fileRecord = File::findOrFail($fileId);
         // Ensure the file exists
-        if (!Storage::disk('public')->exists($fileRecord->path)) {
+        if (!Storage::disk('private')->exists($fileRecord->path)) {
             abort(404);
         }
 
         // Return the file as a response
-        return response()->download(storage_path('/app/public/' . $fileRecord->path));
-        /* return Storage::disk('public')->download($fileRecord->path); */
+        return response()->download(storage_path('/app/private/' . $fileRecord->path));
     }
 }
