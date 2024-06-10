@@ -16,7 +16,7 @@ class FileDownloadController extends Controller
         if (!Storage::disk('public')->exists($fileRecord->path)) {
             abort(404);
         }
-        
+
         // Return the file as a response
         return Storage::disk('public')->download($fileRecord->path);
     }
