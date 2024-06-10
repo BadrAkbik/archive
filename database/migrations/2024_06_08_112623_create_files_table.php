@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('path')->nullable();
-            $table->integer('registeration_number');
+            $table->integer('registeration_number')->nullable();
             $table->text('description')->nullable();
             $table->float('debtor_amount', 2)->nullable();
             $table->float('creditor_amount', 2)->nullable();
-            $table->date('date');
+            $table->date('date')->nullable();
             $table->timestamps();
         });
     }

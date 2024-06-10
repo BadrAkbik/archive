@@ -15,7 +15,6 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -48,7 +47,6 @@ class FileResource extends Resource
                 Hidden::make('user_id')->default(request()->user()->id),
                 TextInput::make('registeration_number')
                     ->label(__('attributes.registeration_number'))
-                    ->required()
                     ->numeric(),
                 Textarea::make('description')
                     ->label(__('attributes.description'))
@@ -89,7 +87,6 @@ class FileResource extends Resource
                     ->searchable(isIndividual: true),
                 TextColumn::make('registeration_number')
                     ->label(__('attributes.registeration_number'))
-                    ->numeric()
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('debtor_amount')

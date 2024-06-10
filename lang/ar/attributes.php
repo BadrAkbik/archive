@@ -38,5 +38,6 @@ return [
     'dashboard' => 'لوحة التحكم',
     'download_file' => 'تحميل الملف',
     'download' => 'تحميل',
-    'view' => 'عرض'
+    'view' => 'عرض',
+    'import' => 'استيراد'
 ];

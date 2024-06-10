@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\FileImport;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
-class FileDownloadController extends Controller
+class FileController extends Controller
 {
     public function download($fileId)
     {
