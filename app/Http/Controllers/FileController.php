@@ -14,6 +14,10 @@ class FileController extends Controller
     {
         // Find the file record by its ID
         $fileRecord = File::findOrFail($fileId);
+
+        if (!$fileRecord->path) {
+            abort(404);
+        }
         // Ensure the file exists
         if (!Storage::disk('private')->exists($fileRecord->path)) {
             abort(404);

@@ -16,4 +16,8 @@ return [
     'role.delete' => 'حذف دور',
     'permissions.view' => 'عرض الاذونات',
     'permission.update' => 'تحديث اذن',
+    'categories.view' => 'عرض الأقسام',
+    'category.create' => 'إنشاء قسم',
+    'category.edit' => 'تعديل قسم',
+    'category.delete' => 'حذف قسم',
 ];

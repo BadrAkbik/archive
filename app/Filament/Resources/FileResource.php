@@ -3,10 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FileResource\Pages;
+use App\Models\Category;
 use App\Models\File;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -16,7 +18,13 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+
+use function Laravel\Prompts\select;
 
 class FileResource extends Resource
 {
@@ -60,6 +68,19 @@ class FileResource extends Resource
                 DatePicker::make('date')
                     ->label(__('attributes.date'))
                     ->required(),
+                Select::make('category_id')
+                    ->label(__('attributes.category'))
+                    ->relationship('category', 'id')
+                    ->exists('categories', 'id')
+                    ->live()
+                    ->preload()
+                    ->options(
+                        function () {
+                            return Category::all()->pluck('name', 'id');
+                        }
+                    )
+                    ->nullable()
+                    ->default(null),
                 FileUpload::make('path')
                     ->label(__('attributes.file'))
                     ->moveFiles()
@@ -74,16 +95,16 @@ class FileResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label(__('attributes.id'))
-                    ->sortable(),
                 TextColumn::make('user.username')
                     ->label(__('attributes.username'))
                     ->searchable(isIndividual: true),
+                TextColumn::make('category.name')
+                    ->label(__('attributes.category_name'))
+                    ->searchable(isIndividual: true),
                 TextColumn::make('description')
                     ->label(__('attributes.description'))
-                    ->wrap()
                     ->words(20)
+                    ->wrap()
                     ->searchable(isIndividual: true),
                 TextColumn::make('registeration_number')
                     ->label(__('attributes.registeration_number'))
@@ -115,8 +136,30 @@ class FileResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+                SelectFilter::make('date')
+                    ->label(__('attributes.year'))
+                    ->options(function () {
+                        return File::selectRaw('YEAR(date) as year')
+                            ->distinct()
+                            ->orderBy('year', 'desc')
+                            ->pluck('year')
+                            ->filter(function ($year) {
+                                return !is_null($year) && $year !== '';
+                            })
+                            ->mapWithKeys(function ($item) {
+                                return [$item => (string)$item];
+                            })
+                            ->toArray();
+                    })
+                    ->query(function (Builder $query, $data) {
+                        if ($data['value']) {
+                            return $query->whereYear('date', $data['value']);
+                        }
+                    }),
+                SelectFilter::make('category_id')
+                    ->label(__('attributes.category_name'))
+                    ->relationship('category', 'name')
+            ], layout: FiltersLayout::AboveContent)
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),

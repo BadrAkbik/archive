@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Category;
 use App\Models\File;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -26,6 +27,7 @@ class FileImport implements ToCollection, WithHeadingRow
             $data = [
                 'user_id' => request()->user()->id,
                 'registeration_number'          => is_numeric($row['registeration_number']) ? (int) $row['registeration_number'] : null,
+                'category_id'            => Category::where('name', $row['category'])->first()?->id,
                 'description'         => $row['description'] ?? null,
                 'date' => $this->formatDate($row['date'] ?? null),
                 'creditor_amount' =>  $this->formatNumber($row['creditor_amount'] ?? null),
@@ -33,10 +35,9 @@ class FileImport implements ToCollection, WithHeadingRow
                 'path' => is_numeric($row['registeration_number']) ? 'pdf_files/' . $row['registeration_number'] . '.pdf' : null,
             ];
 
-            try{
+            try {
                 File::create($data);
-
-            }catch (\Exception $error){
+            } catch (\Exception $error) {
                 throw ValidationException::withMessages(['File' => 'يوجد مشكلة في ملف الاكسل']);
             }
         }

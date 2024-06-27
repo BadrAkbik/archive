@@ -39,5 +39,10 @@ return [
     'download_file' => 'تحميل الملف',
     'download' => 'تحميل',
     'view' => 'عرض',
-    'import' => 'استيراد'
+    'import' => 'استيراد',
+    'categories' => 'الأقسام',
+    'category' => 'قسم',
+    'parent_category' => 'القسم الرئيسي',
+    'category_name' => 'اسم القسم',
+    'year' => 'السنة'
 ];

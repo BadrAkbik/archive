@@ -16,24 +16,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        Role::create(['name' => 'owner']);
-        Role::create(['name' => 'user']);
-        Role::create(['name' => 'admin']);
+        Role::firstOrCreate(['name' => 'owner']);
+        Role::firstOrCreate(['name' => 'user']);
+        Role::firstOrCreate(['name' => 'admin']);
 
         $permissions = include base_path('data/permissions.php');
         foreach ($permissions as $key => $value) {
-            Permission::create([
+            Permission::firstOrCreate([
                 'name' => $key,
                 'name_ar' => $value,
             ]);
         }
 
-        User::create([
+/*         User::firstOrCreate([
             'name' => 'admin',
             'username' => 'admin',
             'email' => 'admin@admin.com',
             'password' => bcrypt('admin123456'),
             'role_id' => 1
-        ]);
+        ]); */
     }
 }
