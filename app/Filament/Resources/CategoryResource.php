@@ -43,6 +43,7 @@ class CategoryResource extends Resource
             ->schema([
                 TextInput::make('name')
                     ->label(__('attributes.name'))
+                    ->unique('categories', 'name')
                     ->required()
                     ->maxLength(255),
                 Select::make('parent_id')
