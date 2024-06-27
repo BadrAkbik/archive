@@ -27,13 +27,15 @@ class DatabaseSeeder extends Seeder
                 'name_ar' => $value,
             ]);
         }
-
-/*         User::firstOrCreate([
-            'name' => 'admin',
-            'username' => 'admin',
-            'email' => 'admin@admin.com',
-            'password' => bcrypt('admin123456'),
-            'role_id' => 1
-        ]); */
+        $user = User::where('username', 'admin')->get();
+        if (!$user) {
+            User::create([
+                'name' => 'admin',
+                'username' => 'admin',
+                'email' => 'admin@admin.com',
+                'password' => bcrypt('admin123456'),
+                'role_id' => 1
+            ]);
+        }
     }
 }
