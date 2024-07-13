@@ -38,12 +38,12 @@ class RoleResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return $record->name !== 'owner';
+        return $record->name !== 'owner' && auth()->user()->hasPermission('role.update');
     }
 
     public static function canDelete($record): bool
     {
-        return $record->name !== 'owner';
+        return $record->name !== 'owner' && auth()->user()->hasPermission('role.delete');
     }
 
 

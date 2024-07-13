@@ -43,12 +43,12 @@ class UserResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return $record->role->name !== 'owner';
+        return $record->role->name !== 'owner' && auth()->user()->hasPermission('user.update');
     }
 
     public static function canDelete($record): bool
     {
-        return $record->role->name !== 'owner';
+        return $record->role->name !== 'owner' && auth()->user()->hasPermission('user.delete');
     }
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
