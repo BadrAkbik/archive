@@ -8,6 +8,10 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
+Route::get('/public/public', function () {
+    return redirect('/admin');
+});
+
 Route::get('/dashboard', function () {
     return redirect('/admin');
 })->middleware(['auth', 'verified'])->name('dashboard');
