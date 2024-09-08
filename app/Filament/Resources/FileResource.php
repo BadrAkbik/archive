@@ -101,6 +101,7 @@ class FileResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->paginated([10, 25, 50, 100, 200, 300, 400, 500, 'all'])
             ->columns([
                 TextColumn::make('user.username')
                     ->label(__('attributes.username'))
