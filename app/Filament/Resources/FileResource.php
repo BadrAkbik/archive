@@ -13,6 +13,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\RawJs;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -61,10 +62,16 @@ class FileResource extends Resource
                     ->maxLength(10000),
                 TextInput::make('debtor_amount')
                     ->label(__('attributes.debtor_amount'))
-                    ->numeric(),
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
+                    ->numeric()
+                    ->maxValue(99999999),
                 TextInput::make('creditor_amount')
                     ->label(__('attributes.creditor_amount'))
-                    ->numeric(),
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
+                    ->numeric()
+                    ->maxValue(99999999),
                 DatePicker::make('date')
                     ->label(__('attributes.date'))
                     ->required(),
@@ -124,9 +131,9 @@ class FileResource extends Resource
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('path')
-                    ->url(fn ($record) => route('file.download', ['fileId' => $record->id])) // Assuming 'path' stores the file path
+                    ->url(fn($record) => route('file.download', ['fileId' => $record->id])) // Assuming 'path' stores the file path
                     ->label(__('attributes.file'))
-                    ->formatStateUsing(fn () => __('attributes.download_file'))
+                    ->formatStateUsing(fn() => __('attributes.download_file'))
                     ->visible(request()->user()->hasPermission('file.download'))
                     ->color('success'),
                 TextColumn::make('created_at')
@@ -147,7 +154,7 @@ class FileResource extends Resource
                                 return !is_null($year) && $year !== '';
                             })
                             ->mapWithKeys(function ($item) {
-                                return [$item => (string)$item];
+                                return [$item => (string) $item];
                             })
                             ->toArray();
                     })
