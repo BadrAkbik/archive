@@ -108,8 +108,6 @@ class FileResource extends Resource
                     ->searchable(isIndividual: true),
                 TextColumn::make('registeration_number')
                     ->label(__('attributes.registeration_number'))
-                    ->numeric()
-                    ->formatStateUsing(fn ($state) => $state)
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('debtor_amount')
