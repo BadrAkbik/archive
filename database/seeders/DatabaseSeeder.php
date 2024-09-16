@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
                 'name_ar' => $value,
             ]);
         }
-        $user = User::where('username', 'admin')->get();
+        $user = User::firstWhere('username', 'admin');
         if (!$user) {
             User::create([
                 'name' => 'admin',

@@ -7,6 +7,7 @@ use App\Imports\FileImport;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
@@ -29,7 +30,19 @@ class ListFiles extends ListRecords
                 ])
                 ->action(function (array $data) {
                     if (isset($data['file'])) {
-                        Excel::import(new FileImport,  Storage::disk('public')->path($data['file']));
+                        try {
+                            Excel::import(new FileImport, Storage::disk('public')->path($data['file']));
+                        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+                            $failures = $e->failures();
+                            foreach ($failures as $failure) {
+                                Notification::make()
+                                    ->title('يوجد مشكلة في ملف الاكسل')
+                                    ->body('يوجد مشكلة في السطر' . $failure->row() . ': ' . $failure->errors()[0])
+                                    ->duration(10000)
+                                    ->danger()
+                                    ->send();
+                            }
+                        }
                     }
                 })
         ];

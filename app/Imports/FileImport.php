@@ -10,37 +10,33 @@ use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
+use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
 
-class FileImport implements ToCollection, WithHeadingRow
+class FileImport implements ToModel, WithHeadingRow, WithValidation
 {
     use Importable;
+
+
+
     /**
      * @param array $row
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function collection(Collection $rows)
+    public function model(array $row)
     {
-
-        foreach ($rows as $row) {
-            $data = [
-                'user_id' => request()->user()->id,
-                'registeration_number'          => is_numeric($row['registeration_number']) ? (int) $row['registeration_number'] : null,
-                'category_id'            => Category::where('name', $row['category'])->first()?->id,
-                'description'         => $row['description'] ?? null,
-                'date' => $this->formatDate($row['date'] ?? null),
-                'creditor_amount' =>  $this->formatNumber($row['creditor_amount'] ?? null),
-                'debtor_amount' => $this->formatNumber($row['debtor_amount'] ?? null),
-                'path' => is_numeric($row['registeration_number']) ? 'pdf_files/' . $row['registeration_number'] . '.pdf' : null,
-            ];
-
-            try {
-                File::create($data);
-            } catch (\Exception $error) {
-                throw ValidationException::withMessages(['File' => 'يوجد مشكلة في ملف الاكسل']);
-            }
-        }
+        return new File([
+            'user_id' => request()->user()->id,
+            'registeration_number' => $row['registeration_number'],
+            'category_id' => Category::where('name', $row['category'])->first()?->id,
+            'description' => $row['description'] ?? null,
+            'date' => $this->formatDate($row['date'] ?? null),
+            'creditor_amount' => $row['creditor_amount'] ? str_replace(',', '', $row['creditor_amount']) : null,
+            'debtor_amount' => $row['debtor_amount'] ? str_replace(',', '', $row['debtor_amount']) : null,
+            'path' => $row['registeration_number'] ?? 'pdf_files/' . $row['registeration_number'] . '.pdf',
+        ]);
     }
     /**
      * Format date to Y-m-d if valid, otherwise return null
@@ -57,14 +53,16 @@ class FileImport implements ToCollection, WithHeadingRow
         }
     }
 
-    /**
-     * Format number to ensure it's valid, otherwise return null
-     *
-     * @param mixed $number
-     * @return float|null
-     */
-    private function formatNumber($number)
+
+    public function rules(): array
     {
-        return is_numeric($number) ? (float) $number : null;
+        return [
+            'registeration_number' => ['required', 'string'],
+            'description' => ['string', 'nullable'],
+            'category' => ['required', 'exists:categories,name'],
+            'creditor_amount' => ['regex:/^\d{1,3}(,\d{3})*(\.\d{2})?$/', 'nullable'],
+            'debtor_amount' => ['regex:/^\d{1,3}(,\d{3})*(\.\d{2})?$/', 'nullable'],
+            'date' => ['date_format:d/m/Y']
+        ];
     }
 }
