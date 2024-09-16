@@ -35,7 +35,7 @@ class FileImport implements ToModel, WithHeadingRow, WithValidation
             'date' => $this->formatDate($row['date'] ?? null),
             'creditor_amount' => $row['creditor_amount'] ? str_replace(',', '', $row['creditor_amount']) : null,
             'debtor_amount' => $row['debtor_amount'] ? str_replace(',', '', $row['debtor_amount']) : null,
-            'path' => $row['registeration_number'] ?? 'pdf_files/' . $row['registeration_number'] . '.pdf',
+            'path' => $row['registeration_number'] ? 'pdf_files/' . $row['registeration_number'] . '.pdf' : null,
         ]);
     }
     /**
