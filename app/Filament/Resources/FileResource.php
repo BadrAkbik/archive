@@ -112,6 +112,7 @@ class FileResource extends Resource
                     ->searchable(isIndividual: true),
                 TextColumn::make('description')
                     ->label(__('attributes.description'))
+                    ->width('100%')
                     ->words(20)
                     ->wrap()
                     ->searchable(isIndividual: true),
@@ -143,7 +144,7 @@ class FileResource extends Resource
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ])->searchDebounce('1000ms')
             ->filters([
                 SelectFilter::make('date')
                     ->label(__('attributes.year'))
