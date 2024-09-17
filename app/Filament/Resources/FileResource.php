@@ -56,9 +56,11 @@ class FileResource extends Resource
                 Hidden::make('user_id')->default(request()->user()->id),
                 TextInput::make('registeration_number')
                     ->label(__('attributes.registeration_number'))
+                    ->required()
                     ->string(),
                 Textarea::make('description')
                     ->label(__('attributes.description'))
+                    ->string()
                     ->maxLength(10000),
                 TextInput::make('debtor_amount')
                     ->label(__('attributes.debtor_amount'))
@@ -74,20 +76,16 @@ class FileResource extends Resource
                     ->maxValue(99999999),
                 DatePicker::make('date')
                     ->label(__('attributes.date'))
+                    ->date()
                     ->displayFormat('d/m/Y')
                     ->required(),
                 Select::make('category_id')
                     ->label(__('attributes.category'))
-                    ->relationship('category', 'id')
+                    ->relationship('category', 'name')
                     ->exists('categories', 'id')
                     ->live()
+                    ->required()
                     ->preload()
-                    ->options(
-                        function () {
-                            return Category::all()->pluck('name', 'id');
-                        }
-                    )
-                    ->nullable()
                     ->default(null),
                 FileUpload::make('path')
                     ->label(__('attributes.file'))

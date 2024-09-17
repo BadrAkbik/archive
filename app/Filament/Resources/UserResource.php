@@ -84,15 +84,11 @@ class UserResource extends Resource
                     ->default(null),
                 Select::make('role_id')
                     ->label(__('attributes.role'))
-                    ->relationship('role', 'id')
+                    ->relationship('role', 'name', fn($query) => $query->whereNot('name', 'owner'))
+                    ->notIn(Role::firstWhere('name', 'owner')->id)
                     ->exists('roles', 'id')
                     ->live()
-                    ->preload()
-                    ->options(
-                        function () {
-                            return Role::whereNotIn('name', ['owner'])->pluck('name', 'id');
-                        }
-                    ),
+                    ->preload(),
                 TextInput::make('password')
                     ->label(__('attributes.password'))
                     ->password()

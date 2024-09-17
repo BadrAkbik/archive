@@ -44,19 +44,15 @@ class CategoryResource extends Resource
                 TextInput::make('name')
                     ->label(__('attributes.name'))
                     ->unique('categories', 'name')
+                    ->string()
                     ->required()
                     ->maxLength(255),
                 Select::make('parent_id')
                     ->label(__('attributes.parent_category'))
-                    ->relationship('parent', 'id')
+                    ->relationship('parent', 'name', fn ($query) => $query->where('parent_id', null))
                     ->exists('categories', 'id')
                     ->live()
                     ->preload()
-                    ->options(
-                        function () {
-                            return Category::where('parent_id', null)->pluck('name', 'id');
-                        }
-                    )
                     ->nullable()
                     ->default(null)
             ]);
